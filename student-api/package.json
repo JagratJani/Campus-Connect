@@ -1,0 +1,27 @@
+{
+  "name": "student-api",
+  "version": "1.0.0",
+  "description": "RESTful Student Management API — Lab 3 (Express.js)",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js"
+  },
+  "keywords": [
+    "rest",
+    "api",
+    "express",
+    "student",
+    "lab3"
+  ],
+  "author": "Jagrat Jani",
+  "license": "ISC",
+  "dependencies": {
+    "cors": "^2.8.6",
+    "dotenv": "^17.4.2",
+    "express": "^4.18.2",
+    "mongoose": "^9.9.3",
+    "swagger-ui-express": "^5.0.0",
+    "yamljs": "^0.3.0"
+  }
+}

@@ -1,0 +1,13 @@
+{
+  "label": "14_POST_order_503_user_service_down",
+  "url": "http://localhost:3003/orders",
+  "method": "POST",
+  "status": 503,
+  "body": {
+    "error": "User Service unavailable. Dependency check failed.",
+    "dependency": "user-service",
+    "targetUrl": "http://user-service:3001/users/1",
+    "details": "User Service unavailable (Request timed out)",
+    "status": 503
+  }
+}

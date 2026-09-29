@@ -1,0 +1,14 @@
+{
+  "label": "10_POST_create_product",
+  "url": "http://localhost:3002/products",
+  "method": "POST",
+  "status": 201,
+  "body": {
+    "id": 105,
+    "name": "Raspberry Pi 4",
+    "category": "Hardware",
+    "price": 55,
+    "stock": 20,
+    "createdAt": "2026-09-29T04:56:49.876Z"
+  }
+}

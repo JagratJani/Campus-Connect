@@ -1,0 +1,27 @@
+{
+  "label": "11_POST_create_order_interservice",
+  "url": "http://localhost:3003/orders",
+  "method": "POST",
+  "status": 201,
+  "body": {
+    "id": 1004,
+    "userId": 1,
+    "productId": 101,
+    "quantity": 2,
+    "totalPrice": 50,
+    "status": "CONFIRMED",
+    "user": {
+      "id": 1,
+      "name": "Jagrat Jani",
+      "email": "jagrat@campus.edu",
+      "role": "Student"
+    },
+    "product": {
+      "id": 101,
+      "name": "Lab Manual: Web Services & SOA",
+      "price": 25,
+      "category": "Books"
+    },
+    "createdAt": "2026-09-29T04:56:49.962Z"
+  }
+}

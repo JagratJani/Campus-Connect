@@ -1,0 +1,27 @@
+{
+  "label": "15_POST_order_201_recovery_after_restart",
+  "url": "http://localhost:3003/orders",
+  "method": "POST",
+  "status": 201,
+  "body": {
+    "id": 1005,
+    "userId": 1,
+    "productId": 101,
+    "quantity": 1,
+    "totalPrice": 25,
+    "status": "CONFIRMED",
+    "user": {
+      "id": 1,
+      "name": "Jagrat Jani",
+      "email": "jagrat@campus.edu",
+      "role": "Student"
+    },
+    "product": {
+      "id": 101,
+      "name": "Lab Manual: Web Services & SOA",
+      "price": 25,
+      "category": "Books"
+    },
+    "createdAt": "2026-09-29T04:57:10.860Z"
+  }
+}

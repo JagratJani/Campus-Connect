@@ -1,0 +1,13 @@
+{
+  "label": "01_user_service_health",
+  "url": "http://localhost:3001/health",
+  "method": "GET",
+  "status": 200,
+  "body": {
+    "status": "UP",
+    "service": "user-service",
+    "port": 3001,
+    "timestamp": "2026-09-29T04:56:49.784Z",
+    "recordCount": 3
+  }
+}

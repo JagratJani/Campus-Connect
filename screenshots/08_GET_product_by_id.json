@@ -1,0 +1,13 @@
+{
+  "label": "08_GET_product_by_id",
+  "url": "http://localhost:3002/products/101",
+  "method": "GET",
+  "status": 200,
+  "body": {
+    "id": 101,
+    "name": "Lab Manual: Web Services & SOA",
+    "category": "Books",
+    "price": 25,
+    "stock": 50
+  }
+}

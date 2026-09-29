@@ -1,0 +1,13 @@
+{
+  "label": "07_GET_user_by_id",
+  "url": "http://localhost:3001/users/1",
+  "method": "GET",
+  "status": 200,
+  "body": {
+    "id": 1,
+    "name": "Jagrat Jani",
+    "email": "jagrat@campus.edu",
+    "role": "Student",
+    "department": "AIML"
+  }
+}

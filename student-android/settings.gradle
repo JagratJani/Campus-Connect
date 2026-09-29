@@ -1,0 +1,2 @@
+﻿rootProject.name = "CampusConnectStudentApp"
+include ':app'

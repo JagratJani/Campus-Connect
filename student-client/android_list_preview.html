@@ -1,0 +1,179 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Android Mobile App Preview</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: Roboto, -apple-system, sans-serif; }
+    body { background: #0b0f19; display: flex; justify-content: center; align-items: center; min-height: 100vh; padding: 20px; }
+    
+    /* Android Phone Mockup Frame */
+    .phone-frame {
+      width: 390px;
+      height: 800px;
+      background: #0f172a;
+      border: 12px solid #1e293b;
+      border-radius: 40px;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      box-shadow: 0 25px 50px -12px rgba(0,0,0,0.7);
+      position: relative;
+    }
+
+    /* Android Status Bar */
+    .status-bar {
+      height: 28px;
+      background: #020617;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0 16px;
+      font-size: 11px;
+      color: #94a3b8;
+    }
+
+    /* App Bar */
+    .app-bar {
+      background: #1e1b4b;
+      color: #ffffff;
+      padding: 14px 16px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    }
+    .app-bar h2 { font-size: 17px; font-weight: 600; }
+    .api-pill { background: #4f46e5; color: #fff; font-size: 10px; padding: 2px 8px; border-radius: 12px; font-family: monospace; }
+
+    /* Content Area */
+    .content { flex: 1; padding: 12px; overflow-y: auto; background: #0f172a; position: relative; }
+
+    /* Student Card (matching item_student.xml) */
+    .student-card {
+      background: #1e293b;
+      border-radius: 12px;
+      padding: 14px;
+      margin-bottom: 10px;
+      border: 1px solid #334155;
+    }
+    .card-top { display: flex; justify-content: space-between; align-items: center; }
+    .name { font-size: 16px; font-weight: 700; color: #f8fafc; }
+    .id-tag { background: #334155; color: #38bdf8; font-size: 11px; font-weight: bold; padding: 2px 8px; border-radius: 4px; font-family: monospace; }
+    .email { font-size: 13px; color: #94a3b8; margin-top: 4px; }
+    .course { font-size: 12px; font-weight: 600; color: #a5b4fc; margin-top: 8px; }
+
+    /* Floating Action Button */
+    .fab {
+      position: absolute;
+      bottom: 20px;
+      right: 20px;
+      width: 56px;
+      height: 56px;
+      background: #4f46e5;
+      color: white;
+      border-radius: 50%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 26px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.4);
+      cursor: pointer;
+    }
+
+    /* Android Toast */
+    .toast {
+      position: absolute;
+      bottom: 85px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(30, 41, 59, 0.95);
+      color: #f8fafc;
+      padding: 8px 16px;
+      border-radius: 20px;
+      font-size: 12px;
+      border: 1px solid #475569;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+      white-space: nowrap;
+    }
+
+    /* Add Screen Form (matching activity_add_student.xml) */
+    .form-group { margin-bottom: 14px; }
+    .form-group label { display: block; font-size: 12px; color: #94a3b8; margin-bottom: 4px; }
+    .form-input {
+      width: 100%;
+      background: #1e293b;
+      border: 1px solid #334155;
+      border-radius: 8px;
+      padding: 10px 12px;
+      color: #f8fafc;
+      font-size: 14px;
+    }
+    .btn-submit {
+      width: 100%;
+      background: #4f46e5;
+      color: #fff;
+      border: none;
+      padding: 12px;
+      border-radius: 8px;
+      font-size: 15px;
+      font-weight: 700;
+      cursor: pointer;
+      margin-top: 10px;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Screen 1: List Screen -->
+  <div class="phone-frame" id="phone-list-view">
+    <div class="status-bar">
+      <span>10:20</span>
+      <span>📶 🔋 100%</span>
+    </div>
+    <div class="app-bar">
+      <h2>CampusConnect Students</h2>
+      <span class="api-pill">GET 10.0.2.2:3000</span>
+    </div>
+    <div class="content" id="students-container">
+      <div class="student-card">
+        <div class="card-top">
+          <span class="name">Jagrat Jani</span>
+          <span class="id-tag">#1</span>
+        </div>
+        <div class="email">jagrat@campus.edu</div>
+        <div class="course">Computer Science • Sem 4</div>
+      </div>
+      <div class="student-card">
+        <div class="card-top">
+          <span class="name">Aarav Patel</span>
+          <span class="id-tag">#2</span>
+        </div>
+        <div class="email">aarav@campus.edu</div>
+        <div class="course">Information Technology • Sem 3</div>
+      </div>
+      <div class="student-card">
+        <div class="card-top">
+          <span class="name">Priya Sharma</span>
+          <span class="id-tag">#3</span>
+        </div>
+        <div class="email">priya@campus.edu</div>
+        <div class="course">Electronics • Sem 5</div>
+      </div>
+      <div class="student-card">
+        <div class="card-top">
+          <span class="name">Rohan Sharma</span>
+          <span class="id-tag">#4</span>
+        </div>
+        <div class="email">rohan.sharma@campus.edu</div>
+        <div class="course">Artificial Intelligence • Sem 5</div>
+      </div>
+
+      <div class="toast">Loaded 4 students from REST API</div>
+      <div class="fab">+</div>
+    </div>
+  </div>
+
+</body>
+</html>

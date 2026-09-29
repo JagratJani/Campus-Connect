@@ -1,0 +1,11 @@
+{
+  "label": "13_POST_order_invalid_product_404",
+  "url": "http://localhost:3003/orders",
+  "method": "POST",
+  "status": 404,
+  "body": {
+    "error": "Product with ID 8888 not found",
+    "dependency": "product-service",
+    "status": 404
+  }
+}

@@ -1,0 +1,123 @@
+# ============================================================
+# CampusConnect Microservices Architecture - Docker Compose (Lab 7)
+# Services: api-gateway, user-service, product-service, order-service
+# Shared Network: campus-network
+#
+# Lab 7 changes vs Lab 6:
+#   - api-gateway added as the single public entry point (port 3000)
+#   - user-service, product-service, order-service ports are no longer
+#     exposed on the host — they are reachable only inside campus-network
+#   - Gateway reads service URLs from env vars (config-based discovery)
+# ============================================================
+
+services:
+
+  # ──────────────────────────────────────────────────────────
+  # API Gateway  (Lab 7 - Part A & B)
+  # The ONLY service with a host-exposed port.
+  # Routes /users, /products, /orders to the correct backend.
+  # Service URLs come from environment variables (service registry).
+  # ──────────────────────────────────────────────────────────
+  api-gateway:
+    build:
+      context: ./api-gateway
+      dockerfile: Dockerfile
+    container_name: api-gateway
+    ports:
+      - "3000:3000"          # Only the gateway is reachable from outside
+    environment:
+      - PORT=3000
+      - GATEWAY_PORT=3000
+      # Service Registry — change these to move services; no code edit required
+      - USER_SERVICE_URL=http://user-service:3001
+      - PRODUCT_SERVICE_URL=http://product-service:3002
+      - ORDER_SERVICE_URL=http://order-service:3003
+    depends_on:
+      - user-service
+      - product-service
+      - order-service
+    networks:
+      - campus-network
+    restart: unless-stopped
+
+  # ──────────────────────────────────────────────────────────
+  # User Service
+  # No host port exposed — internal only via campus-network
+  # ──────────────────────────────────────────────────────────
+  user-service:
+    build:
+      context: ./user-service
+      dockerfile: Dockerfile
+    container_name: user-service
+    # ports section intentionally omitted — not reachable from host
+    expose:
+      - "3001"               # Visible only within campus-network
+    environment:
+      - PORT=3001
+      - USER_SERVICE_PORT=3001
+      - DATA_DIR=/app/data
+    volumes:
+      - user-data:/app/data
+    networks:
+      - campus-network
+    restart: unless-stopped
+
+  # ──────────────────────────────────────────────────────────
+  # Product Service
+  # No host port exposed — internal only via campus-network
+  # ──────────────────────────────────────────────────────────
+  product-service:
+    build:
+      context: ./product-service
+      dockerfile: Dockerfile
+    container_name: product-service
+    expose:
+      - "3002"
+    environment:
+      - PORT=3002
+      - PRODUCT_SERVICE_PORT=3002
+      - DATA_DIR=/app/data
+    volumes:
+      - product-data:/app/data
+    networks:
+      - campus-network
+    restart: unless-stopped
+
+  # ──────────────────────────────────────────────────────────
+  # Order Service
+  # No host port exposed — internal only via campus-network
+  # ──────────────────────────────────────────────────────────
+  order-service:
+    build:
+      context: ./order-service
+      dockerfile: Dockerfile
+    container_name: order-service
+    expose:
+      - "3003"
+    environment:
+      - PORT=3003
+      - ORDER_SERVICE_PORT=3003
+      - USER_SERVICE_URL=http://user-service:3001
+      - PRODUCT_SERVICE_URL=http://product-service:3002
+      - DATA_DIR=/app/data
+    volumes:
+      - order-data:/app/data
+    depends_on:
+      - user-service
+      - product-service
+    networks:
+      - campus-network
+    restart: unless-stopped
+
+networks:
+  campus-network:
+    name: campus-network
+    driver: bridge
+
+volumes:
+  user-data:
+    name: campus-user-data
+  product-data:
+    name: campus-product-data
+  order-data:
+    name: campus-order-data

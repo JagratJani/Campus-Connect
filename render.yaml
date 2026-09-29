@@ -1,0 +1,82 @@
+# render.yaml — Render.com Blueprint for CampusConnect Lab 7
+# Deploys API Gateway + three microservices as separate Web Services
+# All services share environment variables for service discovery.
+#
+# Deploy: push this file to the root of your repo and connect it
+# on render.com → "New Blueprint" → point to your GitHub repo.
+# ================================================================
+
+services:
+
+  # ──────────────────────────────────────────────────────────
+  # API Gateway — the only externally-accessible service
+  # ──────────────────────────────────────────────────────────
+  - type: web
+    name: campus-api-gateway
+    runtime: docker
+    dockerfilePath: ./api-gateway/Dockerfile
+    dockerContext: ./api-gateway
+    plan: free
+    envVars:
+      - key: PORT
+        value: "3000"
+      - key: GATEWAY_PORT
+        value: "3000"
+      # These will be updated after the three services are deployed
+      # with their actual Render internal URLs (e.g. https://campus-user-service.onrender.com)
+      - key: USER_SERVICE_URL
+        value: https://campus-user-service.onrender.com
+      - key: PRODUCT_SERVICE_URL
+        value: https://campus-product-service.onrender.com
+      - key: ORDER_SERVICE_URL
+        value: https://campus-order-service.onrender.com
+
+  # ──────────────────────────────────────────────────────────
+  # User Service
+  # ──────────────────────────────────────────────────────────
+  - type: web
+    name: campus-user-service
+    runtime: docker
+    dockerfilePath: ./user-service/Dockerfile
+    dockerContext: ./user-service
+    plan: free
+    envVars:
+      - key: PORT
+        value: "3001"
+      - key: DATA_DIR
+        value: /app/data
+
+  # ──────────────────────────────────────────────────────────
+  # Product Service
+  # ──────────────────────────────────────────────────────────
+  - type: web
+    name: campus-product-service
+    runtime: docker
+    dockerfilePath: ./product-service/Dockerfile
+    dockerContext: ./product-service
+    plan: free
+    envVars:
+      - key: PORT
+        value: "3002"
+      - key: DATA_DIR
+        value: /app/data
+
+  # ──────────────────────────────────────────────────────────
+  # Order Service
+  # ──────────────────────────────────────────────────────────
+  - type: web
+    name: campus-order-service
+    runtime: docker
+    dockerfilePath: ./order-service/Dockerfile
+    dockerContext: ./order-service
+    plan: free
+    envVars:
+      - key: PORT
+        value: "3003"
+      - key: DATA_DIR
+        value: /app/data
+      # Order service needs to call User and Product services
+      - key: USER_SERVICE_URL
+        value: https://campus-user-service.onrender.com
+      - key: PRODUCT_SERVICE_URL
+        value: https://campus-product-service.onrender.com

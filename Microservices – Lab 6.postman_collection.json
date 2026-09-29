@@ -1,0 +1,321 @@
+{
+  "info": {
+    "_postman_id": "c6a2b8e0-1a86-49bf-9906-eb19cd3c08f6",
+    "name": "Microservices – Lab 6",
+    "description": "Postman Collection for CampusConnect Decomposed Microservices (User Service :3001, Product Service :3002, Order Service :3003) - Web Services & SOA Lab 6",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "USER_SERVICE_URL", "value": "http://localhost:3001", "type": "string" },
+    { "key": "PRODUCT_SERVICE_URL", "value": "http://localhost:3002", "type": "string" },
+    { "key": "ORDER_SERVICE_URL", "value": "http://localhost:3003", "type": "string" }
+  ],
+  "item": [
+    {
+      "name": "1. User Service Direct Endpoints",
+      "item": [
+        {
+          "name": "GET All Users",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": { "raw": "{{USER_SERVICE_URL}}/users", "host": ["{{USER_SERVICE_URL}}"], "path": ["users"] }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function () { pm.response.to.have.status(200); });",
+                  "pm.test('Response is an array of users', function () {",
+                  "    var json = pm.response.json();",
+                  "    pm.expect(Array.isArray(json)).to.be.true;",
+                  "    pm.expect(json.length).to.be.above(0);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "GET User by ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": { "raw": "{{USER_SERVICE_URL}}/users/1", "host": ["{{USER_SERVICE_URL}}"], "path": ["users", "1"] }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function () { pm.response.to.have.status(200); });",
+                  "pm.test('Returns user with id 1', function () {",
+                  "    var json = pm.response.json();",
+                  "    pm.expect(json.id).to.eql(1);",
+                  "    pm.expect(json.name).to.be.a('string');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "POST Create User",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Neha Verma\",\n  \"email\": \"neha.verma@campus.edu\",\n  \"role\": \"Student\",\n  \"department\": \"Information Technology\"\n}"
+            },
+            "url": { "raw": "{{USER_SERVICE_URL}}/users", "host": ["{{USER_SERVICE_URL}}"], "path": ["users"] }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 201 Created', function () { pm.response.to.have.status(201); });",
+                  "pm.test('User created with assigned ID', function () {",
+                  "    var json = pm.response.json();",
+                  "    pm.expect(json.name).to.eql('Neha Verma');",
+                  "    pm.expect(json.id).to.be.a('number');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "PUT Update User",
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Jagrat Jani (Updated)\",\n  \"department\": \"Advanced AI & Robotics\"\n}"
+            },
+            "url": { "raw": "{{USER_SERVICE_URL}}/users/1", "host": ["{{USER_SERVICE_URL}}"], "path": ["users", "1"] }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200 OK', function () { pm.response.to.have.status(200); });",
+                  "pm.test('User updated', function () {",
+                  "    var json = pm.response.json();",
+                  "    pm.expect(json.name).to.include('Updated');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "2. Product Service Direct Endpoints",
+      "item": [
+        {
+          "name": "GET All Products",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": { "raw": "{{PRODUCT_SERVICE_URL}}/products", "host": ["{{PRODUCT_SERVICE_URL}}"], "path": ["products"] }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function () { pm.response.to.have.status(200); });",
+                  "pm.test('Response is an array of products', function () {",
+                  "    var json = pm.response.json();",
+                  "    pm.expect(Array.isArray(json)).to.be.true;",
+                  "    pm.expect(json.length).to.be.above(0);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "GET Product by ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": { "raw": "{{PRODUCT_SERVICE_URL}}/products/101", "host": ["{{PRODUCT_SERVICE_URL}}"], "path": ["products", "101"] }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function () { pm.response.to.have.status(200); });",
+                  "pm.test('Returns product with id 101', function () {",
+                  "    var json = pm.response.json();",
+                  "    pm.expect(json.id).to.eql(101);",
+                  "    pm.expect(json.price).to.be.above(0);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "POST Create Product",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Raspberry Pi 4 Model B\",\n  \"category\": \"Hardware\",\n  \"price\": 55.00,\n  \"stock\": 25\n}"
+            },
+            "url": { "raw": "{{PRODUCT_SERVICE_URL}}/products", "host": ["{{PRODUCT_SERVICE_URL}}"], "path": ["products"] }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 201 Created', function () { pm.response.to.have.status(201); });",
+                  "pm.test('Product created with assigned ID', function () {",
+                  "    var json = pm.response.json();",
+                  "    pm.expect(json.name).to.eql('Raspberry Pi 4 Model B');",
+                  "    pm.expect(json.id).to.be.a('number');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "3. Order Service & Service-to-Service Communication",
+      "item": [
+        {
+          "name": "GET All Orders",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": { "raw": "{{ORDER_SERVICE_URL}}/orders", "host": ["{{ORDER_SERVICE_URL}}"], "path": ["orders"] }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function () { pm.response.to.have.status(200); });",
+                  "pm.test('Returns list of orders', function () {",
+                  "    var json = pm.response.json();",
+                  "    pm.expect(Array.isArray(json)).to.be.true;",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "POST Create Order (Valid User & Product - 201 Created)",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"userId\": 1,\n  \"productId\": 101,\n  \"quantity\": 2\n}"
+            },
+            "url": { "raw": "{{ORDER_SERVICE_URL}}/orders", "host": ["{{ORDER_SERVICE_URL}}"], "path": ["orders"] }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 201 Created', function () { pm.response.to.have.status(201); });",
+                  "pm.test('Order has verified user and product details', function () {",
+                  "    var json = pm.response.json();",
+                  "    pm.expect(json.userId).to.eql(1);",
+                  "    pm.expect(json.productId).to.eql(101);",
+                  "    pm.expect(json.quantity).to.eql(2);",
+                  "    pm.expect(json.totalPrice).to.eql(50.00);",
+                  "    pm.expect(json.user.name).to.be.a('string');",
+                  "    pm.expect(json.product.name).to.be.a('string');",
+                  "    pm.expect(json.status).to.eql('CONFIRMED');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "POST Create Order with Invalid User ID (404 Not Found)",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"userId\": 9999,\n  \"productId\": 101,\n  \"quantity\": 1\n}"
+            },
+            "url": { "raw": "{{ORDER_SERVICE_URL}}/orders", "host": ["{{ORDER_SERVICE_URL}}"], "path": ["orders"] }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 404 Not Found', function () { pm.response.to.have.status(404); });",
+                  "pm.test('Controlled error indicates user not found', function () {",
+                  "    var json = pm.response.json();",
+                  "    pm.expect(json.error).to.include('9999');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "POST Create Order when Dependency Down (503 Service Unavailable)",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"userId\": 1,\n  \"productId\": 101,\n  \"quantity\": 1\n}"
+            },
+            "url": { "raw": "{{ORDER_SERVICE_URL}}/orders", "host": ["{{ORDER_SERVICE_URL}}"], "path": ["orders"] }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Controlled 503 Service Unavailable when dependency is down', function () {",
+                  "    pm.expect([503, 201]).to.include(pm.response.code);",
+                  "    if (pm.response.code === 503) {",
+                  "        var json = pm.response.json();",
+                  "        pm.expect(json.error).to.include('unavailable');",
+                  "    }",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

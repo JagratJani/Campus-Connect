@@ -1,0 +1,14 @@
+{
+  "label": "09_POST_create_user",
+  "url": "http://localhost:3001/users",
+  "method": "POST",
+  "status": 201,
+  "body": {
+    "id": 4,
+    "name": "Riya Shah",
+    "email": "riya.shah@campus.edu",
+    "role": "Student",
+    "department": "AIML",
+    "createdAt": "2026-09-29T04:56:49.861Z"
+  }
+}

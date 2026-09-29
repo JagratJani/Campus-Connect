@@ -1,0 +1,36 @@
+{
+  "label": "05_GET_all_products",
+  "url": "http://localhost:3002/products",
+  "method": "GET",
+  "status": 200,
+  "body": [
+    {
+      "id": 101,
+      "name": "Lab Manual: Web Services & SOA",
+      "category": "Books",
+      "price": 25,
+      "stock": 50
+    },
+    {
+      "id": 102,
+      "name": "CampusConnect ID Card Holder",
+      "category": "Accessories",
+      "price": 10,
+      "stock": 100
+    },
+    {
+      "id": 103,
+      "name": "Arduino Starter Kit",
+      "category": "Electronics",
+      "price": 75,
+      "stock": 30
+    },
+    {
+      "id": 104,
+      "name": "Cloud Computing Textbook",
+      "category": "Books",
+      "price": 45,
+      "stock": 40
+    }
+  ]
+}

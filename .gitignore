@@ -1,0 +1,21 @@
+# Dependencies
+node_modules/
+npm-debug.log*
+
+# Environment / secrets — never commit these
+.env
+atlas-credentials.env
+
+# Docker build cache
+.dockerignore
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+
+# Persistent data volumes (local only)
+*/data/

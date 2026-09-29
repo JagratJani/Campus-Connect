@@ -1,0 +1,13 @@
+{
+  "label": "02_product_service_health",
+  "url": "http://localhost:3002/health",
+  "method": "GET",
+  "status": 200,
+  "body": {
+    "status": "UP",
+    "service": "product-service",
+    "port": 3002,
+    "timestamp": "2026-09-29T04:56:49.805Z",
+    "recordCount": 4
+  }
+}

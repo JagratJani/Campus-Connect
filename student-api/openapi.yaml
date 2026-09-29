@@ -1,0 +1,413 @@
+openapi: 3.0.3
+info:
+  title: CampusConnect Student Management API
+  description: |
+    ## RESTful Web Services – Lab 3
+    
+    A fully resource-oriented RESTful API for managing students at CampusConnect university portal.
+    
+    ### Framework
+    - **Primary**: Express.js (Node.js) – Complete CRUD
+    - **Equivalent**: Spring Boot – GET + POST demonstrated
+    
+    ### Base URL
+    `http://localhost:3000`
+    
+    ### Authentication
+    No authentication required for this lab (in-memory data store).
+    
+    ### Student Resource Fields
+    | Field | Type | Constraints |
+    |-------|------|-------------|
+    | `id` | integer | Auto-generated, read-only |
+    | `name` | string | Required, non-empty |
+    | `email` | string | Required, valid email format |
+    | `course` | string | Required, non-empty |
+    | `semester` | integer | Required, 1–12 |
+    
+    ---
+    **Student**: Jagrat Jani | 23CS0101 | CSE (AIML) Sem 4  
+    **Subject**: Web Services & SOA Lab
+  version: 1.0.0
+  contact:
+    name: Jagrat Jani
+    email: jagrat@campus.edu
+  license:
+    name: MIT
+
+servers:
+  - url: http://localhost:3000
+    description: Local development server
+
+tags:
+  - name: Students
+    description: CRUD operations on the Student resource
+
+paths:
+  /students:
+    get:
+      tags: [Students]
+      summary: List all students
+      description: >
+        Returns a complete list of all students stored in the in-memory 
+        data store. Returns HTTP 200 OK with a JSON array.
+      operationId: getAllStudents
+      responses:
+        '200':
+          description: Successfully retrieved all students
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StudentsListResponse'
+              example:
+                status: success
+                count: 3
+                data:
+                  - id: 1
+                    name: Jagrat Jani
+                    email: jagrat@campus.edu
+                    course: Computer Science
+                    semester: 4
+                  - id: 2
+                    name: Aarav Patel
+                    email: aarav@campus.edu
+                    course: Information Technology
+                    semester: 3
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+    post:
+      tags: [Students]
+      summary: Create a new student
+      description: >
+        Creates a new student resource. All fields (name, email, course, semester) 
+        are required. Returns HTTP 201 Created on success, 400 Bad Request if 
+        validation fails.
+      operationId: createStudent
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/StudentInput'
+            examples:
+              valid:
+                summary: Valid student creation
+                value:
+                  name: Aarav Patel
+                  email: aarav@example.com
+                  course: Computer Science
+                  semester: 5
+              invalid_email:
+                summary: Invalid email (returns 400)
+                value:
+                  name: ""
+                  email: invalid-email
+                  semester: -2
+      responses:
+        '201':
+          description: Student created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SingleStudentResponse'
+              example:
+                status: success
+                message: Student created successfully
+                data:
+                  id: 4
+                  name: Aarav Patel
+                  email: aarav@example.com
+                  course: Computer Science
+                  semester: 5
+        '400':
+          $ref: '#/components/responses/ValidationError'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+  /students/{id}:
+    parameters:
+      - $ref: '#/components/parameters/StudentId'
+
+    get:
+      tags: [Students]
+      summary: Get a student by ID
+      description: >
+        Returns a single student record identified by the path parameter `id`. 
+        Returns 200 OK if found, 404 Not Found if no student exists with that ID.
+      operationId: getStudentById
+      responses:
+        '200':
+          description: Student found and returned
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SingleStudentResponse'
+              example:
+                status: success
+                data:
+                  id: 1
+                  name: Jagrat Jani
+                  email: jagrat@campus.edu
+                  course: Computer Science
+                  semester: 4
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+    put:
+      tags: [Students]
+      summary: Replace a student (full update)
+      description: >
+        Completely replaces an existing student record. All fields are required.
+        Returns 200 OK with updated record, 404 if student not found, 400 if validation fails.
+      operationId: updateStudent
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/StudentInput'
+            example:
+              name: Jagrat Jani
+              email: jagrat.updated@campus.edu
+              course: CSE (AIML)
+              semester: 5
+      responses:
+        '200':
+          description: Student updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SingleStudentResponse'
+        '400':
+          $ref: '#/components/responses/ValidationError'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+    patch:
+      tags: [Students]
+      summary: Partially update a student
+      description: >
+        Updates only the provided fields in a student record. 
+        Unspecified fields retain their current values.
+      operationId: patchStudent
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/StudentPatchInput'
+            example:
+              semester: 5
+      responses:
+        '200':
+          description: Student partially updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SingleStudentResponse'
+        '400':
+          $ref: '#/components/responses/ValidationError'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+    delete:
+      tags: [Students]
+      summary: Delete a student
+      description: >
+        Permanently deletes a student from the data store. 
+        Returns 200 OK with the deleted record if successful, 404 if not found.
+      operationId: deleteStudent
+      responses:
+        '200':
+          description: Student deleted successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SingleStudentResponse'
+              example:
+                status: success
+                message: Student with ID 1 deleted successfully
+                data:
+                  id: 1
+                  name: Jagrat Jani
+                  email: jagrat@campus.edu
+                  course: Computer Science
+                  semester: 4
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+components:
+  parameters:
+    StudentId:
+      in: path
+      name: id
+      required: true
+      schema:
+        type: integer
+        minimum: 1
+      description: Unique numeric ID of the student
+      example: 1
+
+  schemas:
+    Student:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+          example: 1
+        name:
+          type: string
+          example: Jagrat Jani
+        email:
+          type: string
+          format: email
+          example: jagrat@campus.edu
+        course:
+          type: string
+          example: Computer Science
+        semester:
+          type: integer
+          minimum: 1
+          maximum: 12
+          example: 4
+      required: [id, name, email, course, semester]
+
+    StudentInput:
+      type: object
+      properties:
+        name:
+          type: string
+          minLength: 1
+          example: Aarav Patel
+        email:
+          type: string
+          format: email
+          example: aarav@example.com
+        course:
+          type: string
+          minLength: 1
+          example: Computer Science
+        semester:
+          type: integer
+          minimum: 1
+          maximum: 12
+          example: 5
+      required: [name, email, course, semester]
+
+    StudentPatchInput:
+      type: object
+      properties:
+        name:
+          type: string
+          minLength: 1
+        email:
+          type: string
+          format: email
+        course:
+          type: string
+          minLength: 1
+        semester:
+          type: integer
+          minimum: 1
+          maximum: 12
+
+    StudentsListResponse:
+      type: object
+      properties:
+        status:
+          type: string
+          example: success
+        count:
+          type: integer
+          example: 3
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/Student'
+
+    SingleStudentResponse:
+      type: object
+      properties:
+        status:
+          type: string
+          example: success
+        message:
+          type: string
+          example: Operation successful
+        data:
+          $ref: '#/components/schemas/Student'
+
+    ErrorResponse:
+      type: object
+      properties:
+        status:
+          type: string
+          example: error
+        message:
+          type: string
+          example: Validation failed
+        errors:
+          type: array
+          items:
+            type: string
+          example:
+            - name is required and must be a non-empty string
+            - email is required and must be a valid email address
+            - semester is required and must be an integer between 1 and 12
+
+  responses:
+    ValidationError:
+      description: Bad Request – Validation failed
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            status: error
+            message: Validation failed
+            errors:
+              - name is required and must be a non-empty string
+              - email is required and must be a valid email address
+              - semester is required and must be an integer between 1 and 12
+
+    BadRequest:
+      description: Bad Request – Invalid input
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            status: error
+            message: Invalid ID format. ID must be an integer.
+
+    NotFound:
+      description: Not Found – Student does not exist
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            status: error
+            message: Student with ID 99 not found
+
+    InternalError:
+      description: Internal Server Error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            status: error
+            message: Internal Server Error

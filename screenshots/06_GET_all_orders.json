@@ -1,0 +1,71 @@
+{
+  "label": "06_GET_all_orders",
+  "url": "http://localhost:3003/orders",
+  "method": "GET",
+  "status": 200,
+  "body": [
+    {
+      "id": 1001,
+      "userId": 1,
+      "productId": 101,
+      "quantity": 1,
+      "totalPrice": 25,
+      "status": "CONFIRMED",
+      "user": {
+        "id": 1,
+        "name": "Jagrat Jani",
+        "email": "jagrat@campus.edu",
+        "role": "Student"
+      },
+      "product": {
+        "id": 101,
+        "name": "Lab Manual: Web Services & SOA",
+        "price": 25,
+        "category": "Books"
+      },
+      "createdAt": "2026-09-29T04:21:10.898Z"
+    },
+    {
+      "id": 1002,
+      "userId": 1,
+      "productId": 101,
+      "quantity": 2,
+      "totalPrice": 50,
+      "status": "CONFIRMED",
+      "user": {
+        "id": 1,
+        "name": "Jagrat Jani",
+        "email": "jagrat@campus.edu",
+        "role": "Student"
+      },
+      "product": {
+        "id": 101,
+        "name": "Lab Manual: Web Services & SOA",
+        "price": 25,
+        "category": "Books"
+      },
+      "createdAt": "2026-09-29T04:24:07.809Z"
+    },
+    {
+      "id": 1003,
+      "userId": 1,
+      "productId": 101,
+      "quantity": 1,
+      "totalPrice": 25,
+      "status": "CONFIRMED",
+      "user": {
+        "id": 1,
+        "name": "Jagrat Jani",
+        "email": "jagrat@campus.edu",
+        "role": "Student"
+      },
+      "product": {
+        "id": 101,
+        "name": "Lab Manual: Web Services & SOA",
+        "price": 25,
+        "category": "Books"
+      },
+      "createdAt": "2026-09-29T04:27:49.719Z"
+    }
+  ]
+}
