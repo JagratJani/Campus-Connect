@@ -1,9 +1,8 @@
 # CampusConnect – API Gateway, Service Discovery & Cloud Deployment (Lab 7)
 ## Web Services & SOA Laboratory — Lab 7: Gateway • Service Discovery • Cloud
 
-> **Student:** Jagrat Jani | 23CS0101 | CSE (AIML)  
-> **Course:** Web Services & SOA Laboratory (Sem 3)  
-> **Topic:** API Gateway · Configuration-Based Service Discovery · Cloud Deployment on Render
+> **Student:** Jagrat Jani | 202512119  
+> **Course:** Web Services & SOA (Sem 3)  
 
 ---
 
