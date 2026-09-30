@@ -22,12 +22,11 @@ services:
         value: "3000"
       - key: GATEWAY_PORT
         value: "3000"
-      # These will be updated after the three services are deployed
-      # with their actual Render internal URLs (e.g. https://campus-user-service.onrender.com)
+      # Live Render URLs configured for Cloud Service Discovery
       - key: USER_SERVICE_URL
-        value: https://campus-user-service.onrender.com
+        value: https://campus-user-service-s3zg.onrender.com
       - key: PRODUCT_SERVICE_URL
-        value: https://campus-product-service.onrender.com
+        value: https://campus-product-service-uqzj.onrender.com
       - key: ORDER_SERVICE_URL
         value: https://campus-order-service.onrender.com
 
@@ -75,8 +74,8 @@ services:
         value: "3003"
       - key: DATA_DIR
         value: /app/data
-      # Order service needs to call User and Product services
+      # Order service calls User and Product services for inter-service validation
       - key: USER_SERVICE_URL
-        value: https://campus-user-service.onrender.com
+        value: https://campus-user-service-s3zg.onrender.com
       - key: PRODUCT_SERVICE_URL
-        value: https://campus-product-service.onrender.com
+        value: https://campus-product-service-uqzj.onrender.com

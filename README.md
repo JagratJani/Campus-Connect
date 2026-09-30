@@ -176,46 +176,52 @@ A dynamic registry (e.g. Kubernetes DNS) adds: automatic registration/deregistra
 
 ### Platform: Render.com (Free Tier)
 
-All four services are deployed as Docker containers on **Render.com** using the included [`render.yaml`](./render.yaml) Blueprint.
+All four microservices are containerized with Docker and deployed to **Render.com** using the Blueprint infrastructure specification [`render.yaml`](./render.yaml).
 
-### Deployed Services
+- **GitHub Repository:** [`https://github.com/JagratJani/Campus-Connect`](https://github.com/JagratJani/Campus-Connect)
+- **Render Blueprint Name:** `Campus-Connect`
+- **Active Branch:** `main`
 
-| Service | Render Service Name | Public URL |
-|:---|:---|:---|
-| API Gateway | `campus-api-gateway` | `https://campus-api-gateway.onrender.com` |
-| User Service | `campus-user-service` | `https://campus-user-service.onrender.com` (internal) |
-| Product Service | `campus-product-service` | `https://campus-product-service.onrender.com` (internal) |
-| Order Service | `campus-order-service` | `https://campus-order-service.onrender.com` (internal) |
+### Live Deployed Services & Public URLs
 
-> **Public gateway URL:** `https://campus-api-gateway.onrender.com`
+| Service | Render Service Name | Type | Live Cloud URL | Status |
+|:---|:---|:---|:---|:---|
+| **API Gateway** | `campus-api-gateway` | Web Service (Public) | [`https://campus-api-gateway-re5k.onrender.com`](https://campus-api-gateway-re5k.onrender.com) | 🟢 Live |
+| **User Service** | `campus-user-service` | Web Service (Internal) | [`https://campus-user-service-s3zg.onrender.com`](https://campus-user-service-s3zg.onrender.com) | 🟢 Live |
+| **Product Service** | `campus-product-service` | Web Service (Internal) | [`https://campus-product-service-uqzj.onrender.com`](https://campus-product-service-uqzj.onrender.com) | 🟢 Live |
+| **Order Service** | `campus-order-service` | Web Service (Internal) | [`https://campus-order-service.onrender.com`](https://campus-order-service.onrender.com) | 🟢 Live |
+
+> 🌐 **Public API Gateway Entry Point:**  
+> **`https://campus-api-gateway-re5k.onrender.com`**  
+> *(All external requests from Postman or browsers must be sent only to this single public gateway endpoint)*
 
 ### Cloud Environment Variables (Service Registry on Cloud)
 
-On Render, the same env-var pattern is used. No code changes are needed — only the variable values change from Docker DNS names to Render public URLs:
+On Render, configuration-based service discovery is implemented via environment variables. The API Gateway and Order Service reference cloud URLs dynamically without changing application source code:
 
-| Variable | Docker Compose Value | Render Cloud Value |
+#### 1. API Gateway (`campus-api-gateway`) Environment Configuration:
+| Environment Variable | Local Docker Value | Live Render Cloud Value |
 |:---|:---|:---|
-| `USER_SERVICE_URL` | `http://user-service:3001` | `https://campus-user-service.onrender.com` |
-| `PRODUCT_SERVICE_URL` | `http://product-service:3002` | `https://campus-product-service.onrender.com` |
+| `USER_SERVICE_URL` | `http://user-service:3001` | `https://campus-user-service-s3zg.onrender.com` |
+| `PRODUCT_SERVICE_URL` | `http://product-service:3002` | `https://campus-product-service-uqzj.onrender.com` |
 | `ORDER_SERVICE_URL` | `http://order-service:3003` | `https://campus-order-service.onrender.com` |
 
-This is the same config-driven discovery from Part B, now pointing to cloud URLs instead of Docker DNS names.
+#### 2. Order Service (`campus-order-service`) Environment Configuration:
+| Environment Variable | Local Docker Value | Live Render Cloud Value |
+|:---|:---|:---|
+| `USER_SERVICE_URL` | `http://user-service:3001` | `https://campus-user-service-s3zg.onrender.com` |
+| `PRODUCT_SERVICE_URL` | `http://product-service:3002` | `https://campus-product-service-uqzj.onrender.com` |
 
-### Deployment Steps
+### Cloud Deployment Steps Performed
 
-1. Push this repository to GitHub (ensure `render.yaml` is at the root).
-2. Log in to [render.com](https://render.com) → **New** → **Blueprint**.
-3. Connect your GitHub repository.
-4. Render reads `render.yaml` and creates all four Web Services automatically.
-5. Wait for all four services to deploy (first deploy can take 3–5 minutes per service on free tier).
-6. After the three microservices have deployed, copy their Render public URLs and set them as environment variables on `campus-api-gateway`:
-   - `USER_SERVICE_URL` → URL of `campus-user-service`
-   - `PRODUCT_SERVICE_URL` → URL of `campus-product-service`
-   - `ORDER_SERVICE_URL` → URL of `campus-order-service`
-7. Trigger a manual redeploy of the gateway to pick up the new variables.
-8. Test `GET https://campus-api-gateway.onrender.com/health` from Postman.
+1. **Repository Setup:** Committed and pushed all microservices, Dockerfiles, and `render.yaml` to GitHub repository `JagratJani/Campus-Connect`.
+2. **Blueprint Deployment:** Created a new Blueprint on Render, linked to the `main` branch of `Campus-Connect`.
+3. **Automated Docker Builds:** Render parsed `render.yaml` and built 4 separate Docker containers on Alpine Linux for each service.
+4. **Service Discovery Configuration:** Configured the generated public HTTPS URLs into `campus-api-gateway` and `campus-order-service` environment variables.
+5. **Gateway Verification:** Verified that `https://campus-api-gateway-re5k.onrender.com/health` returns `status: UP` and reflects all 3 downstream service URLs in its live registry.
+6. **End-to-End Testing:** Re-tested all endpoints from Postman against the live cloud gateway URL, validating the full chain: Postman → API Gateway → User/Product/Order Services.
 
-> **Free tier note:** Render free web services spin down after 15 minutes of inactivity. The first request after a cold start may take 30–60 seconds. This is a platform limitation, not an application bug.
+> **Note on Free Tier Sleep Behavior:** Render free tier instances spin down after 15 minutes of inactivity. When a request is made after an idle period, containers undergo a cold start (~30–50s). Subsequent requests respond with sub-second latency.
 
 ---
 
@@ -330,9 +336,32 @@ See [`compose.yaml`](./compose.yaml) for the full file. Key Lab 7 changes:
 | 8 | `GET /orders` | 200 | Orders listed |
 | 9 | `GET /users` (user-service stopped) | 502 | Clean error, no hang |
 
-### Cloud (https://campus-api-gateway.onrender.com)
+### Cloud (https://campus-api-gateway-re5k.onrender.com)
 
-Same tests repeated against the public URL confirm the full gateway → service → storage chain works over the internet.
+All requests were tested against the live, public Render gateway URL from Postman, verifying the entire public-to-internal chain:
+
+| # | Request URL | Method | Expected Status | Verified Status | Cloud Response Evidence / Notes |
+|:---|:---|:---|:---|:---|:---|
+| 1 | `https://campus-api-gateway-re5k.onrender.com/health` | `GET` | `200 OK` | `200 OK` | Gateway reports `UP`; registry lists all 3 live Render URLs |
+| 2 | `https://campus-api-gateway-re5k.onrender.com/users` | `GET` | `200 OK` | `200 OK` | Returns array of user profiles (`Jagrat Jani`, etc.) from cloud user-service |
+| 3 | `https://campus-api-gateway-re5k.onrender.com/users/1` | `GET` | `200 OK` | `200 OK` | Returns User ID 1 record (`Jagrat Jani`, `AIML`) |
+| 4 | `https://campus-api-gateway-re5k.onrender.com/products` | `GET` | `200 OK` | `200 OK` | Returns catalog array (4 items) from cloud product-service |
+| 5 | `https://campus-api-gateway-re5k.onrender.com/products/101` | `GET` | `200 OK` | `200 OK` | Returns item 101 (`Lab Manual: Web Services & SOA`) |
+| 6 | `https://campus-api-gateway-re5k.onrender.com/orders` | `POST` | `201 Created` | `201 Created` | Order `#1002` created ($50); inter-service validation across cloud services |
+| 7 | `https://campus-api-gateway-re5k.onrender.com/orders` | `GET` | `200 OK` | `200 OK` | Lists all confirmed orders placed in cloud storage |
+| 8 | `https://campus-api-gateway-re5k.onrender.com/users/999` | `GET` | `404 Not Found` | `404 Not Found` | Clean 404 error routed from user-service via gateway |
+| 9 | `https://campus-api-gateway-re5k.onrender.com/unknown` | `GET` | `404 Not Found` | `404 Not Found` | Gateway itself catches unknown route |
+
+### Submission Screenshot Evidence (`Deployment-Screenshots/`)
+
+All visual evidence required by the assignment checklist is organized in the [`Deployment-Screenshots/`](./Deployment-Screenshots/) directory:
+
+- 📸 **Render Cloud Deployment Dashboard:** Shows all 4 microservice containers (`campus-api-gateway`, `campus-user-service`, `campus-product-service`, `campus-order-service`) in **Deployed (🟢 Live)** status on Render.com.
+- 📸 **Gateway Health Check (`GET /health`):** Postman test verifying gateway liveness and runtime service registry populated with live Render URLs.
+- 📸 **Users Route via Gateway (`GET /users`):** Postman test returning 200 OK with all user profile records.
+- 📸 **Products Catalog via Gateway (`GET /products`):** Postman test returning 200 OK with product catalog entries.
+- 📸 **Inter-Service Order Placement (`POST /orders`):** Postman test creating an order, showing end-to-end cloud inter-service communication (Gateway → Order Service → User + Product validation).
+- 📸 **Error Handling & Resilience:** Postman testing demonstrating controlled 502 Bad Gateway / 404 Not Found behavior.
 
 ---
 
@@ -411,12 +440,13 @@ Lab7_Api-Gateway/
 │   ├── server.js
 │   ├── package.json
 │   └── Dockerfile
+├── Deployment-Screenshots/       ← NEW: Postman & Cloud deployment screenshots
 ├── compose.yaml                  ← UPDATED (Lab 7): gateway added, services internal-only
-├── render.yaml                   ← NEW (Lab 7): Render.com Blueprint
+├── render.yaml                   ← NEW (Lab 7): Render.com Blueprint with live service URLs
 ├── Microservices - Lab 6.postman_collection.json
 └── README.md                     ← UPDATED (Lab 7)
 ```
 
 ---
 
-*© 2026 CampusConnect · Web Services & SOA Lab 7: API Gateway & Cloud Deployment · Jagrat Jani | 23CS0101*
+*© 2026 CampusConnect · Web Services & SOA Lab 7: API Gateway & Cloud Deployment · Jagrat Jani | 202512119*
