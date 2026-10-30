@@ -1,0 +1,13 @@
+{
+  "name": "campus-connect-microservices",
+  "version": "1.0.0",
+  "description": "CampusConnect Microservices Architecture - Web Services & SOA Lab 8",
+  "private": true,
+  "scripts": {
+    "test": "npm --prefix api-gateway test && npm --prefix user-service test && npm --prefix product-service test && npm --prefix order-service test",
+    "test:gateway": "npm --prefix api-gateway test",
+    "test:user": "npm --prefix user-service test",
+    "test:product": "npm --prefix product-service test",
+    "test:order": "npm --prefix order-service test"
+  }
+}

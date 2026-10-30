@@ -8,6 +8,7 @@ const express = require('express');
 const cors = require('cors');
 const fs = require('fs');
 const path = require('path');
+const client = require('prom-client');
 require('dotenv').config();
 
 const app = express();
@@ -16,6 +17,27 @@ const USER_SERVICE_URL = process.env.USER_SERVICE_URL || 'http://user-service:30
 const PRODUCT_SERVICE_URL = process.env.PRODUCT_SERVICE_URL || 'http://product-service:3002';
 const DATA_DIR = process.env.DATA_DIR || path.join(__dirname, 'data');
 const DATA_FILE = path.join(DATA_DIR, 'orders.json');
+
+// ────────────────────────────────────────────────────────────
+// Prometheus Metrics Setup (Lab 8 - Monitoring)
+// ────────────────────────────────────────────────────────────
+const register = new client.Registry();
+client.collectDefaultMetrics({ register, prefix: 'order_service_' });
+
+const httpRequestCounter = new client.Counter({
+  name: 'http_requests_total',
+  help: 'Total number of HTTP requests processed by Order Service',
+  labelNames: ['method', 'route', 'status'],
+  registers: [register],
+});
+
+const httpRequestDuration = new client.Histogram({
+  name: 'http_request_duration_seconds',
+  help: 'Duration of HTTP requests in seconds in Order Service',
+  labelNames: ['method', 'route', 'status'],
+  buckets: [0.005, 0.01, 0.025, 0.05, 0.1, 0.25, 0.5, 1, 2.5, 5],
+  registers: [register],
+});
 
 app.use(cors());
 app.use(express.json());
@@ -74,9 +96,29 @@ function saveStorage() {
 
 initStorage();
 
-// Request logging middleware
+// Request logging & metrics middleware
 app.use((req, res, next) => {
+  const start = Date.now();
   console.log(`[order-service] ${req.method} ${req.url}`);
+
+  res.on('finish', () => {
+    const durationMs = Date.now() - start;
+    const durationSeconds = durationMs / 1000;
+    const route = req.path.startsWith('/orders') ? '/orders' : req.path;
+
+    httpRequestCounter.inc({
+      method: req.method,
+      route,
+      status: res.statusCode.toString(),
+    });
+
+    httpRequestDuration.observe({
+      method: req.method,
+      route,
+      status: res.statusCode.toString(),
+    }, durationSeconds);
+  });
+
   next();
 });
 
@@ -126,6 +168,16 @@ app.get('/health', (req, res) => {
     timestamp: new Date().toISOString(),
     recordCount: orders.length
   });
+});
+
+// Prometheus Metrics Endpoint (Lab 8 - Monitoring)
+app.get('/metrics', async (req, res) => {
+  try {
+    res.set('Content-Type', register.contentType);
+    res.end(await register.metrics());
+  } catch (err) {
+    res.status(500).end(err.message);
+  }
 });
 
 // GET /orders - Retrieve all orders

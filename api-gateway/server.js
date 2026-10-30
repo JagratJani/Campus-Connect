@@ -21,10 +21,32 @@
 const express = require('express');
 const cors = require('cors');
 const { createProxyMiddleware } = require('http-proxy-middleware');
+const client = require('prom-client');
 require('dotenv').config();
 
 const app = express();
 const PORT = process.env.PORT || process.env.GATEWAY_PORT || 3000;
+
+// ────────────────────────────────────────────────────────────
+// Prometheus Metrics Setup (Lab 8 - Monitoring)
+// ────────────────────────────────────────────────────────────
+const register = new client.Registry();
+client.collectDefaultMetrics({ register, prefix: 'gateway_' });
+
+const httpRequestCounter = new client.Counter({
+  name: 'http_requests_total',
+  help: 'Total number of HTTP requests processed by the API Gateway',
+  labelNames: ['method', 'route', 'status'],
+  registers: [register],
+});
+
+const httpRequestDuration = new client.Histogram({
+  name: 'http_request_duration_seconds',
+  help: 'Duration of HTTP requests in seconds through the API Gateway',
+  labelNames: ['method', 'route', 'status'],
+  buckets: [0.005, 0.01, 0.025, 0.05, 0.1, 0.25, 0.5, 1, 2.5, 5],
+  registers: [register],
+});
 
 // ────────────────────────────────────────────────────────────
 // Service Registry  (Part B – configuration-based discovery)
@@ -55,21 +77,47 @@ console.log('==============================================');
 app.use(cors());
 
 // ────────────────────────────────────────────────────────────
-// Request logging middleware
+// Request logging & Metrics middleware
 // ────────────────────────────────────────────────────────────
 app.use((req, res, next) => {
   const start = Date.now();
   const timestamp = new Date().toISOString();
 
   let targetService = 'gateway';
-  if (req.path.startsWith('/users'))    targetService = `user-service    → ${serviceRegistry.user}`;
-  else if (req.path.startsWith('/products')) targetService = `product-service → ${serviceRegistry.product}`;
-  else if (req.path.startsWith('/orders'))   targetService = `order-service   → ${serviceRegistry.order}`;
+  let routeLabel = req.path;
+  if (req.path.startsWith('/users')) {
+    targetService = `user-service    → ${serviceRegistry.user}`;
+    routeLabel = '/users';
+  } else if (req.path.startsWith('/products')) {
+    targetService = `product-service → ${serviceRegistry.product}`;
+    routeLabel = '/products';
+  } else if (req.path.startsWith('/orders')) {
+    targetService = `order-service   → ${serviceRegistry.order}`;
+    routeLabel = '/orders';
+  } else if (req.path === '/health') {
+    routeLabel = '/health';
+  } else if (req.path === '/metrics') {
+    routeLabel = '/metrics';
+  }
 
   res.on('finish', () => {
-    const duration = Date.now() - start;
+    const durationMs = Date.now() - start;
+    const durationSeconds = durationMs / 1000;
+
+    httpRequestCounter.inc({
+      method: req.method,
+      route: routeLabel,
+      status: res.statusCode.toString(),
+    });
+
+    httpRequestDuration.observe({
+      method: req.method,
+      route: routeLabel,
+      status: res.statusCode.toString(),
+    }, durationSeconds);
+
     console.log(
-      `[gateway] ${timestamp} | ${req.method} ${req.originalUrl} | target: ${targetService} | status: ${res.statusCode} | ${duration}ms`
+      `[gateway] ${timestamp} | ${req.method} ${req.originalUrl} | target: ${targetService} | status: ${res.statusCode} | ${durationMs}ms`
     );
   });
 
@@ -91,6 +139,18 @@ app.get('/health', (req, res) => {
       orderService:   serviceRegistry.order,
     },
   });
+});
+
+// ────────────────────────────────────────────────────────────
+// Prometheus Metrics Endpoint (Lab 8 - Monitoring)
+// ────────────────────────────────────────────────────────────
+app.get('/metrics', async (req, res) => {
+  try {
+    res.set('Content-Type', register.contentType);
+    res.end(await register.metrics());
+  } catch (err) {
+    res.status(500).end(err.message);
+  }
 });
 
 // ────────────────────────────────────────────────────────────
@@ -163,7 +223,7 @@ app.use((req, res) => {
   res.status(404).json({
     error: 'Route not found on API Gateway.',
     path: req.originalUrl,
-    availableRoutes: ['/health', '/users', '/products', '/orders'],
+    availableRoutes: ['/health', '/metrics', '/users', '/products', '/orders'],
   });
 });
 
@@ -174,6 +234,7 @@ app.listen(PORT, '0.0.0.0', () => {
   console.log(`==============================================`);
   console.log(`🚀 API Gateway running on port ${PORT}`);
   console.log(`   Health:   http://localhost:${PORT}/health`);
+  console.log(`   Metrics:  http://localhost:${PORT}/metrics`);
   console.log(`   Users:    http://localhost:${PORT}/users`);
   console.log(`   Products: http://localhost:${PORT}/products`);
   console.log(`   Orders:   http://localhost:${PORT}/orders`);

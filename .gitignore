@@ -6,6 +6,9 @@ npm-debug.log*
 .env
 atlas-credentials.env
 
+# Kubernetes secrets (contain sensitive credentials)
+k8s/secret.yaml
+
 # Docker build cache
 .dockerignore
 
